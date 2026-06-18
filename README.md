@@ -10,6 +10,60 @@ It replies in your language (Korean or English) — even if you can't read code,
 
 ---
 
+## 핵심 기능 / Core features
+
+honclwd는 Superpowers(brainstorming · writing-plans · debugging 등)를 **호출해 쓰고**, 그 위에 아래 ①~⑬을 더합니다. 기획 → 계획 → 구현 → 검증 → 마무리 흐름에 걸쳐 동작합니다.
+*honclwd **calls** Superpowers (brainstorming · writing-plans · debugging …) and adds ①–⑬ on top, across the plan → build → verify → wrap-up flow.*
+
+```mermaid
+flowchart TD
+    SP["🧰 Superpowers 엔진 / engine (의존·dependency)<br/>brainstorming · writing-plans · debugging"]
+
+    subgraph S1["기획 / Plan"]
+        F1["① 작업 시작 카드<br/>Task kickoff card"]
+        F2["② 레퍼런싱<br/>Referencing"]
+        F3["③ 제품 지도<br/>Product map (spec + IA)"]
+    end
+
+    F4["④ 계획 검증 게이트 🚦<br/>Plan gate · plan-validator"]
+    F5["⑤ 모델 라우팅<br/>Opus 판단 · Sonnet 병렬"]
+
+    subgraph S2["검증 / Verify"]
+        F6["⑥ 실제 구동 검증 🐳<br/>Real run-through (Docker)"]
+        F7["⑦ 디자인 정합성<br/>Design-system check"]
+        F8["⑧ 코드 검증 게이트 🚦<br/>Code gate · pr-reviewer"]
+    end
+
+    F9["⑨ 끝 점검<br/>Final check (scoring)"]
+    CC["전 단계 공통 / Always-on<br/>⑩ 비전문가 요약 · ⑪ 멈춤 규칙<br/>⑫ 개인화 메모리 · ⑬ 언어 적응형"]
+
+    SP -.->|호출·calls| S1
+    S1 --> F4 --> F5 --> S2 --> F9
+    F6 --> F7 --> F8
+    CC -.->|모든 단계에 적용 · applies throughout| F5
+
+    classDef gate fill:#fde8e8,stroke:#e02424,color:#111;
+    class F4,F8 gate;
+```
+
+| # | 기능 | 무엇을 하나 / What it does |
+|---|------|---------------------------|
+| ① | **작업 시작 카드** · Task kickoff card | 착수 전에 목표·성공기준·범위를 합의 / agree on goal·success criteria·scope *before* building |
+| ② | **레퍼런싱** · Referencing | 기획 중 경쟁사·사례를 조사해 "남들은→우리는"으로 방향 잡기 / competitor & case research to steady the direction |
+| ③ | **제품 지도** · Product map | 기능 명세 + 화면 구조(IA)를 살아있는 문서로 유지 / a living feature spec + screen-structure (IA) map |
+| ④ | **계획 검증 게이트** · Plan gate | 독립 적대 심판(plan-validator, Opus)이 **통과 못 하면 멈춤** / adversarial Opus judge that blocks until the plan passes |
+| ⑤ | **모델 라우팅** · Model routing | 판단은 Opus, 기계적 작업은 Sonnet 병렬로 (느리고 비싼 "전부 Opus" 회피) / Opus for judgment, parallel Sonnet for mechanical work |
+| ⑥ | **실제 구동 검증** · Real run-through | 화면을 격리 Docker에서 직접 눌러봄, **운영 쓰기는 차단** / clicks real screens in an isolated Docker env; production writes are hard-blocked |
+| ⑦ | **디자인 정합성** · Design-system check | 새 화면이 색·컴포넌트·레이아웃 규칙과 맞는지 검증, 새 패턴은 등록 제안 / checks design rules, proposes registering new patterns |
+| ⑧ | **코드 검증 게이트** · Code gate | PR 전 적대적 코드 검수(pr-reviewer, Opus) / adversarial code review before a PR |
+| ⑨ | **끝 점검** · Final check | 성공기준으로 채점(자가점검 + 게이트 심판) / scores the result against the success criteria |
+| ⑩ | **비전문가 요약** · Plain-language summary | 모든 기술 결과를 쉬운 말로(전 단계 공통) / every technical result explained simply |
+| ⑪ | **멈춤 규칙** · Stop rules | 삭제·배포·비용·노출 같은 되돌리기 어려운 일 앞에서 멈춰 확인 / pauses before delete·deploy·cost·exposure |
+| ⑫ | **개인화 메모리** · Personalized memory | 도메인·선호를 학습해 개인화(자격증명·시크릿은 저장 안 함) / learns your domain & preferences (never credentials/secrets) |
+| ⑬ | **언어 적응형** · Language-adaptive | 사용자 언어로 응답(기본 한국어) / replies in your language (default Korean) |
+
+---
+
 ## English
 
 ### Why honclwd
@@ -20,18 +74,7 @@ Built for people building alone. These days Claude writes the code — but when 
 - **Debugging drags on, and review is shaky.** Claude codes fast, but countless edge situations go uncontrolled and quality slips. → honclwd adds **step-by-step adversarial verification** (plan & code gates), and has Claude **actually click through the real screens in an isolated Docker environment** instead of just reading code.
 - **The UI drifts.** Every time you add a button the design shifts a little. → honclwd checks new screens against your **design rules** (colors, components, layout) and proposes registering genuinely new patterns.
 
-In short: Claude does the coding; honclwd keeps the *direction, the verification, and the consistency* from slipping.
-
-### What it does
-
-- **Task kickoff card** — agree on "what" and "how far" *before* building.
-- **Verification gates** — adversarially review the plan and the code (plan-validator / pr-reviewer) to catch risks early.
-- **Real run-through** — don't stop at reading code; actually launch the UI in an isolated test environment and click through it.
-- **Plain-language summary** — explains technical results as "what I just did, and what could go wrong."
-- **Stop rules** — asks first before hard-to-undo actions (deletes, deploys, external sends, cost, exposure).
-- **Referencing** — finds and distills competitors / similar cases during planning.
-- **Product map** — keeps a living feature list and screen structure (IA) up to date.
-- **Design-system consistency** — checks whether new screens match existing design rules, and proposes registering new patterns.
+In short: Claude does the coding; honclwd keeps the *direction, the verification, and the consistency* from slipping. (See the [Core features](#핵심-기능--core-features) table above for the full ①–⑬ list.)
 
 > Language-adaptive: the workflow replies in the language you use (defaults to Korean). The source content is Korean, but Claude reads it and answers you in your language.
 
@@ -77,18 +120,7 @@ This plugin uses the **Superpowers** methodology skills (brainstorming, planning
 - **디버깅이 끝이 없고, 검수가 허술하다.** Claude가 코딩은 빨리 해도 수많은 변수 상황을 다 통제하지 못해 품질이 떨어집니다. → 계획과 코드를 **단계별로 적대적으로 검증**하고, 코드만 읽고 끝내는 게 아니라 Claude가 **실제 화면을 격리된 Docker 환경에서 직접 눌러가며** 테스트합니다.
 - **화면이 점점 따로 논다.** 버튼 하나 추가할 때마다 디자인이 미묘하게 달라지는 그 현상. → 새 화면이 **디자인 규칙**(색·컴포넌트·레이아웃)과 맞는지 검증하고, 진짜 새로운 패턴은 규칙으로 등록을 제안합니다.
 
-한마디로: 코딩은 Claude가, **방향·검증·일관성이 흐트러지지 않게** 잡아주는 건 honclwd가.
-
-### 무엇을 해주나요
-
-- **작업 시작 카드** — 만들기 전에 "무엇을·어디까지" 합의하고 시작합니다.
-- **검증 게이트** — 계획과 코드를 *적대적으로* 검수해(plan-validator / pr-reviewer) 위험을 미리 잡습니다.
-- **실제 구동 검증** — 화면·앱을 코드로만 끝내지 않고, 격리된 테스트 환경에서 실제로 띄워보고 눌러봅니다.
-- **쉬운 요약** — 기술 결과를 "지금 무엇을 했고, 잘못되면 어떤 일이 생기는지"로 풀어 설명합니다(사용자 언어로).
-- **멈춤 규칙** — 되돌리기 어려운 일(삭제·배포·외부 전송·비용·노출) 앞에서는 먼저 확인을 받습니다.
-- **레퍼런싱** — 기획 중 비슷한 사례·경쟁사를 찾아 정리합니다.
-- **제품 지도** — 기능 목록과 화면 구조(IA)를 자동으로 정리·갱신합니다.
-- **디자인 시스템 정합성** — 새 화면이 기존 디자인 규칙과 맞는지 보고, 새 패턴은 규칙으로 등록 제안합니다.
+한마디로: 코딩은 Claude가, **방향·검증·일관성이 흐트러지지 않게** 잡아주는 건 honclwd가. (전체 ①~⑬ 기능은 위 [핵심 기능](#핵심-기능--core-features) 표를 보세요.)
 
 > 언어 적응형: 워크플로우는 사용자가 쓰는 언어로 응답합니다(기본 한국어). 소스는 한국어지만 Claude가 읽고 사용자 언어로 답합니다.
 

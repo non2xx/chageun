@@ -1,7 +1,7 @@
 # 혼클로드 (honclwd)
 
-**A Claude Code workflow plugin that helps non-developers build safely, on their own.**
-비개발자가 **혼자서도 안전하게** 만들 수 있도록 돕는 Claude Code 워크플로우 플러그인입니다.
+**For solo builders & vibe coders — a Claude Code workflow that steadies the parts where solo building falls apart.**
+**혼자 만드는 바이브 코더를 위한 Claude Code 워크플로우** — 혼자 만들 때 무너지기 쉬운 지점들을 받쳐줍니다.
 
 It replies in your language (Korean or English) — even if you can't read code, safety gates and plain-language explanations have your back.
 코드를 직접 읽지 못해도, 안전장치와 쉬운 설명(사용자 언어에 맞춰 — 한국어/영어)이 옆에서 받쳐줍니다.
@@ -11,6 +11,16 @@ It replies in your language (Korean or English) — even if you can't read code,
 ---
 
 ## English
+
+### Why honclwd
+
+Built for people building alone. These days Claude writes the code — but when you actually try to ship something solo, three things tend to fall apart:
+
+- **You're not sure *what* to build.** Without a clear direction the result wobbles. → honclwd strengthens the **planning stage** — reference research, a living feature spec, and a screen-structure (IA) map so the target stays steady.
+- **Debugging drags on, and review is shaky.** Claude codes fast, but countless edge situations go uncontrolled and quality slips. → honclwd adds **step-by-step adversarial verification** (plan & code gates), and has Claude **actually click through the real screens in an isolated Docker environment** instead of just reading code.
+- **The UI drifts.** Every time you add a button the design shifts a little. → honclwd checks new screens against your **design rules** (colors, components, layout) and proposes registering genuinely new patterns.
+
+In short: Claude does the coding; honclwd keeps the *direction, the verification, and the consistency* from slipping.
 
 ### What it does
 
@@ -24,6 +34,11 @@ It replies in your language (Korean or English) — even if you can't read code,
 - **Design-system consistency** — checks whether new screens match existing design rules, and proposes registering new patterns.
 
 > Language-adaptive: the workflow replies in the language you use (defaults to Korean). The source content is Korean, but Claude reads it and answers you in your language.
+
+### Requirements
+
+- **Node.js** (required) — used by both Claude Code and honclwd. Check with `node -v`.
+- **Docker Desktop** *(or local Supabase)* — recommended **only if** you want the real run-through test on an app with a backend/database. Claude clicks through your screens in this isolated environment so it never touches production data. Static / DB-less apps don't need it. honclwd does not auto-install Docker — install [Docker Desktop](https://www.docker.com/products/docker-desktop/) yourself.
 
 ### Install
 
@@ -54,6 +69,16 @@ This plugin uses the **Superpowers** methodology skills (brainstorming, planning
 
 ## 한국어
 
+### 왜 만들었나
+
+혼자 만드는 사람을 위해 만들었습니다. 요즘은 코딩을 Claude가 해주지만, 막상 혼자 무언가를 끝까지 만들어보면 세 군데서 무너집니다:
+
+- **"뭘 만들지"가 흔들린다.** 방향이 명확하지 않으니 결과물도 갈팡질팡하죠. → honclwd는 **기획 단계를 보강**합니다 — 레퍼런스 조사, 살아있는 기능 명세, 화면 구조(IA) 정리로 목표가 흔들리지 않게 잡아줍니다.
+- **디버깅이 끝이 없고, 검수가 허술하다.** Claude가 코딩은 빨리 해도 수많은 변수 상황을 다 통제하지 못해 품질이 떨어집니다. → 계획과 코드를 **단계별로 적대적으로 검증**하고, 코드만 읽고 끝내는 게 아니라 Claude가 **실제 화면을 격리된 Docker 환경에서 직접 눌러가며** 테스트합니다.
+- **화면이 점점 따로 논다.** 버튼 하나 추가할 때마다 디자인이 미묘하게 달라지는 그 현상. → 새 화면이 **디자인 규칙**(색·컴포넌트·레이아웃)과 맞는지 검증하고, 진짜 새로운 패턴은 규칙으로 등록을 제안합니다.
+
+한마디로: 코딩은 Claude가, **방향·검증·일관성이 흐트러지지 않게** 잡아주는 건 honclwd가.
+
 ### 무엇을 해주나요
 
 - **작업 시작 카드** — 만들기 전에 "무엇을·어디까지" 합의하고 시작합니다.
@@ -66,6 +91,11 @@ This plugin uses the **Superpowers** methodology skills (brainstorming, planning
 - **디자인 시스템 정합성** — 새 화면이 기존 디자인 규칙과 맞는지 보고, 새 패턴은 규칙으로 등록 제안합니다.
 
 > 언어 적응형: 워크플로우는 사용자가 쓰는 언어로 응답합니다(기본 한국어). 소스는 한국어지만 Claude가 읽고 사용자 언어로 답합니다.
+
+### 준비물
+
+- **Node.js** (필수) — Claude Code와 honclwd 둘 다 사용합니다. `node -v`로 확인.
+- **Docker Desktop** *(또는 로컬 Supabase)* — 백엔드/DB가 있는 앱을 **실제 구동 검증**으로 테스트할 때만 권장합니다. Claude가 이 격리된 환경에서 화면을 눌러보므로 운영 데이터를 절대 건드리지 않습니다. 정적·DB 없는 앱은 필요 없습니다. honclwd가 Docker를 자동설치하지는 않으니 [Docker Desktop](https://www.docker.com/products/docker-desktop/)을 직접 설치하세요.
 
 ### 설치
 

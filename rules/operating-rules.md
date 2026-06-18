@@ -6,7 +6,9 @@
 
 사용자는 비개발자다. 코드를 직접 읽거나 검증하지 못할 수 있다.
 모든 기술적 결정과 산출물은 쉽고 간단 명료한 방식으로 설명되어야 한다.
-응답 언어는 한국어를 기본으로 한다.
+
+**응답 언어(적응형):** 사용자가 쓰는 언어에 맞춰 응답한다. 사용자가 한국어로 말하면 한국어로, 영어로 말하면 영어로 답한다. 불분명하면 한국어를 기본값으로 한다. 아래 모든 출력 양식("비전문가 요약", "작업 시작 카드", 게이트 결과 보고 등)의 한국어 라벨은 **템플릿**이며, 실제 출력 시 사용자 언어로 옮겨 렌더한다(예: 영어 사용자에겐 "Plain-language summary / What I did / Why / If it goes well / Risks / What to check next"). 이 규칙은 스킬·에이전트 출력 등 사용자 대면 모든 결과물에 적용된다.
+(This workflow is language-adaptive: reply in the user's language; default to Korean. The Korean section labels below are templates — render them in the user's language.)
 
 # 응답 형식 규칙
 

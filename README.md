@@ -12,8 +12,8 @@ It replies in your language (Korean or English) — even if you can't read code,
 
 ## 핵심 기능 / Core features
 
-honclwd는 Superpowers(brainstorming · writing-plans · debugging 등)를 **호출해 쓰고**, 그 위에 아래 ①~⑬을 더합니다. 기획 → 계획 → 구현 → 검증 → 마무리 흐름에 걸쳐 동작합니다.
-*honclwd **calls** Superpowers (brainstorming · writing-plans · debugging …) and adds ①–⑬ on top, across the plan → build → verify → wrap-up flow.*
+honclwd는 Superpowers(brainstorming · writing-plans · debugging 등)를 **호출해 쓰고**, 그 위에 아래 ①~⑮을 더합니다. 기획 → 계획 → 구현 → 검증 → 마무리 흐름에 걸쳐 동작합니다.
+*honclwd **calls** Superpowers (brainstorming · writing-plans · debugging …) and adds ①–⑮ on top, across the plan → build → verify → wrap-up flow.*
 
 ```mermaid
 flowchart TD
@@ -62,6 +62,7 @@ flowchart TD
 | ⑫ | **개인화 메모리** · Personalized memory | 도메인·선호를 학습해 개인화(자격증명·시크릿은 저장 안 함) / learns your domain & preferences (never credentials/secrets) |
 | ⑬ | **언어 적응형** · Language-adaptive | 사용자 언어로 응답(기본 한국어) / replies in your language (default Korean) |
 | ⑭ | **약속-미실행 자동 가드** · Promise-without-doing guard | 작업을 하겠다고 말만 하고 멈추면 자동으로 다시 하게 함 / auto-nudges Claude to actually do what it said |
+| ⑮ | **최소 구현 우선** · Minimal-first | 군더더기 없이 꼭 필요한 만큼만 만들도록 점검(안전·검증은 그대로) / builds only what's needed, no over-engineering (safety/validation kept) |
 
 ---
 
@@ -75,7 +76,7 @@ Built for people building alone. These days Claude writes the code — but when 
 - **Debugging drags on, and review is shaky.** Claude codes fast, but countless edge situations go uncontrolled and quality slips. → honclwd adds **step-by-step adversarial verification** (plan & code gates), and has Claude **actually click through the real screens in an isolated Docker environment** instead of just reading code.
 - **The UI drifts.** Every time you add a button the design shifts a little. → honclwd checks new screens against your **design rules** (colors, components, layout) and proposes registering genuinely new patterns.
 
-In short: Claude does the coding; honclwd keeps the *direction, the verification, and the consistency* from slipping. (See the [Core features](#핵심-기능--core-features) table above for the full ①–⑬ list.)
+In short: Claude does the coding; honclwd keeps the *direction, the verification, and the consistency* from slipping. (See the [Core features](#핵심-기능--core-features) table above for the full ①–⑮ list.)
 
 > Language-adaptive: the workflow replies in the language you use (defaults to Korean). The source content is Korean, but Claude reads it and answers you in your language.
 
@@ -121,7 +122,7 @@ This plugin uses the **Superpowers** methodology skills (brainstorming, planning
 - **디버깅이 끝이 없고, 검수가 허술하다.** Claude가 코딩은 빨리 해도 수많은 변수 상황을 다 통제하지 못해 품질이 떨어집니다. → 계획과 코드를 **단계별로 적대적으로 검증**하고, 코드만 읽고 끝내는 게 아니라 Claude가 **실제 화면을 격리된 Docker 환경에서 직접 눌러가며** 테스트합니다.
 - **화면이 점점 따로 논다.** 버튼 하나 추가할 때마다 디자인이 미묘하게 달라지는 그 현상. → 새 화면이 **디자인 규칙**(색·컴포넌트·레이아웃)과 맞는지 검증하고, 진짜 새로운 패턴은 규칙으로 등록을 제안합니다.
 
-한마디로: 코딩은 Claude가, **방향·검증·일관성이 흐트러지지 않게** 잡아주는 건 honclwd가. (전체 ①~⑬ 기능은 위 [핵심 기능](#핵심-기능--core-features) 표를 보세요.)
+한마디로: 코딩은 Claude가, **방향·검증·일관성이 흐트러지지 않게** 잡아주는 건 honclwd가. (전체 ①~⑮ 기능은 위 [핵심 기능](#핵심-기능--core-features) 표를 보세요.)
 
 > 언어 적응형: 워크플로우는 사용자가 쓰는 언어로 응답합니다(기본 한국어). 소스는 한국어지만 Claude가 읽고 사용자 언어로 답합니다.
 

@@ -12,8 +12,8 @@ It replies in your language (Korean or English) — even if you can't read code,
 
 ## 핵심 기능 / Core features
 
-honclwd는 Superpowers(brainstorming · writing-plans · debugging 등)를 **호출해 쓰고**, 그 위에 아래 ①~⑱을 더합니다. 기획 → 계획 → 구현 → 검증 → 마무리 흐름에 걸쳐 동작합니다.
-*honclwd **calls** Superpowers (brainstorming · writing-plans · debugging …) and adds ①–⑱ on top, across the plan → build → verify → wrap-up flow.*
+honclwd는 Superpowers(brainstorming · writing-plans · debugging 등)를 **호출해 쓰고**, 그 위에 아래 ①~⑲을 더합니다. 기획 → 계획 → 구현 → 검증 → 마무리 흐름에 걸쳐 동작합니다.
+*honclwd **calls** Superpowers (brainstorming · writing-plans · debugging …) and adds ①–⑲ on top, across the plan → build → verify → wrap-up flow.*
 
 ```mermaid
 flowchart TD
@@ -66,6 +66,7 @@ flowchart TD
 | ⑯ | **검수·작성·git 안전 강화** · Sharper review & git safety | 결함 클래스 점검, 증거 기반 완료, 위험한 git 명령 방지(스캐너가 아닌 점검 지침) / sharper review, evidence-based completion, git safety guards (guidance, not a scanner) |
 | ⑰ | **검증 체크리스트 등뼈** · Verification backbone | 기능마다 '작동 확인 체크리스트'를 IA 연결까지 포함해 지속 관리 — 끝 점검·정기 점검의 단일 기준 / per-feature verification checklist (incl. IA connections), reused for end-check & monitoring |
 | ⑱ | **정기 자동 점검** · Scheduled monitoring | 매일 자동으로 검증 체크리스트를 돌려 손님 말하기 전에 깨짐을 잡음(GitHub Actions+Docker, 프로젝트마다 생성) / runs the verification checklist daily to catch breakage before users do (GitHub Actions + Docker, generated per project) |
+| ⑲ | **자동 보안 스캔** · Security scan | 의존성·시크릿·코드(SAST)·접근제어(RLS)를 무료로 자동 점검 — 흔한 구멍을 잡되 비즈니스 로직은 별도 / free automated dependency·secret·SAST·access-control scans (catches common holes; business logic still needs a human) |
 
 ---
 
@@ -79,7 +80,7 @@ Built for people building alone. These days Claude writes the code — but when 
 - **Debugging drags on, and review is shaky.** Claude codes fast, but countless edge situations go uncontrolled and quality slips. → honclwd adds **step-by-step adversarial verification** (plan & code gates), and has Claude **actually click through the real screens in an isolated Docker environment** instead of just reading code.
 - **The UI drifts.** Every time you add a button the design shifts a little. → honclwd checks new screens against your **design rules** (colors, components, layout) and proposes registering genuinely new patterns.
 
-In short: Claude does the coding; honclwd keeps the *direction, the verification, and the consistency* from slipping. (See the [Core features](#핵심-기능--core-features) table above for the full ①–⑱ list.)
+In short: Claude does the coding; honclwd keeps the *direction, the verification, and the consistency* from slipping. (See the [Core features](#핵심-기능--core-features) table above for the full ①–⑲ list.)
 
 > **Core stance:** honclwd doesn't throw work away and regenerate it from a spec — it treats what you've built as the real asset, and refines it with a living map and continuous verification. That's how real, path-dependent work (with live users and data) actually has to be managed — which is why it fits non-developers shipping real apps.
 
@@ -127,7 +128,7 @@ This plugin uses the **Superpowers** methodology skills (brainstorming, planning
 - **디버깅이 끝이 없고, 검수가 허술하다.** Claude가 코딩은 빨리 해도 수많은 변수 상황을 다 통제하지 못해 품질이 떨어집니다. → 계획과 코드를 **단계별로 적대적으로 검증**하고, 코드만 읽고 끝내는 게 아니라 Claude가 **실제 화면을 격리된 Docker 환경에서 직접 눌러가며** 테스트합니다.
 - **화면이 점점 따로 논다.** 버튼 하나 추가할 때마다 디자인이 미묘하게 달라지는 그 현상. → 새 화면이 **디자인 규칙**(색·컴포넌트·레이아웃)과 맞는지 검증하고, 진짜 새로운 패턴은 규칙으로 등록을 제안합니다.
 
-한마디로: 코딩은 Claude가, **방향·검증·일관성이 흐트러지지 않게** 잡아주는 건 honclwd가. (전체 ①~⑱ 기능은 위 [핵심 기능](#핵심-기능--core-features) 표를 보세요.)
+한마디로: 코딩은 Claude가, **방향·검증·일관성이 흐트러지지 않게** 잡아주는 건 honclwd가. (전체 ①~⑲ 기능은 위 [핵심 기능](#핵심-기능--core-features) 표를 보세요.)
 
 > **핵심 관점:** honclwd는 **있는 걸 버리고 스펙에서 재생성하지 않는다.** 당신이 만든 것을 진짜 자산으로 보고, **살아있는 지도와 지속 검증으로 다듬는다.** 실제 손님·데이터가 살아있는 경로 의존적 일은 원래 이렇게 다뤄야 하며, 그래서 실제 앱을 운영하는 비개발자에게 맞는다.
 

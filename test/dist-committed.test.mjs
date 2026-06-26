@@ -1,6 +1,6 @@
 import { test, before } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,6 +20,7 @@ for (const plat of ["claude", "codex"]) {
   test(`커밋된 dist/${plat}는 build(src)와 일치`, () => {
     const committed = join(ROOT, "dist", plat);
     const fresh = join(TMP, plat);
+    assert.ok(existsSync(committed), `커밋된 dist/${plat}/ 없음 — npm run build && git add dist/ 후 커밋하세요`);
     const a = listTree(committed), b = listTree(fresh);
     assert.deepEqual(a, b, `${plat} 파일목록 불일치`);
     for (const f of a)

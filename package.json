@@ -1,0 +1,11 @@
+{
+  "name": "chageun-build",
+  "version": "0.18.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "snapshot": "node test/snapshot-golden.mjs",
+    "build": "node build/build.mjs",
+    "test": "node --test"
+  }
+}

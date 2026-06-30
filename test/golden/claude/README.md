@@ -15,10 +15,10 @@
 
 ### 왜 기획과 검증인가
 
-비개발자의 코딩에서 제일 중요한 건 화려한 기능이 아니라 **기획**과 **검증**입니다.
+AI 시대엔 사람의 일이 '만들기'에서 **'검증·판단'으로 옮겨갑니다.** 만드는 건 Claude가 빠르게 해주니, 정작 어려운 건 쏟아진 결과가 맞는지 가려내는 일이죠. 그래서 비개발자의 코딩에서 제일 중요한 건 화려한 기능이 아니라 **기획**과 **검증**입니다.
 
 - **기획이 약하면 — 원하던 것과 다른 게 나옵니다.** 방향이 흐릿하면 Claude가 아무리 빨리 만들어도 엉뚱한 결과가 됩니다. chageun는 레퍼런스 조사·살아있는 기능 명세·화면 구조(IA)로 "뭘 만들지"를 먼저 또렷하게 잡습니다.
-- **검증이 약하면 — 무한 디버깅 지옥에 갇힙니다.** A를 고치면 B가 터지고, B를 고치면 C가, C를 고치면 다시 A가… 이 굴레요. chageun는 계획과 코드를 단계마다 적대적으로 검수하고, 코드만 읽는 게 아니라 **격리된 환경에서 화면을 직접 눌러** 확인해 그 고리를 끊습니다.
+- **검증이 약하면 — 빠르게 만든 만큼 빚이 쌓입니다.** 처음엔 빨라 보이지만, 검증 없이 찍어내면 세 가지가 조용히 쌓여요: ① AI가 만든 게 쌓일수록 다음 작업이 **더 느려지고**, ② 아무도 제대로 이해 못 한 결과물이 **그대로 굴러가고**, ③ 왜 이렇게 만들었는지 **이유가 휘발돼** 나중에 못 고칩니다. 게다가 A를 고치면 B가 터지는 무한 디버깅까지. chageun는 계획과 코드를 단계마다 적대적으로 검수하고, 코드만 읽는 게 아니라 **격리된 환경에서 화면을 직접 눌러** 확인해 이 고리를 끊습니다.
 
 어려운 말은 필요 없습니다. **코드는 Claude가, 당신은 결정만.** 코드를 못 읽어도 안전장치와 쉬운 설명이 받쳐줍니다.
 
@@ -82,10 +82,10 @@ chageun는 [Superpowers](#함께-설치되는-것-중요) 위에 얹혀 **기획
 
 ### Why planning and verification
 
-For people building alone, the two things that matter most aren't features — they're **planning** and **verification**.
+In the AI era, a person's job shifts from *making* to **verifying and deciding** — Claude produces fast, so the hard part becomes telling whether what poured out is actually right. For people building alone, the two things that matter most aren't features — they're **planning** and **verification**.
 
 - **Weak planning → you get something other than what you wanted.** When the direction is fuzzy, Claude builds fast but builds the wrong thing. chageun pins down *what to build* first — reference research, a living feature spec, a screen map (IA).
-- **Weak verification → you get stuck in infinite debugging.** Fix A and B breaks; fix B and C breaks; fix C and A breaks again. chageun reviews plans and code adversarially at every step, and actually **clicks through your real screens in an isolated environment** to break that loop.
+- **Weak verification → speed quietly turns into debt.** It looks fast at first, but churning out code without checking piles up three things: ① the more AI-made code accumulates, the **slower** the next change gets; ② work **nobody actually understands** ships anyway; ③ the **reasons behind decisions evaporate**, so later you can't fix them — plus the infinite loop where fixing A breaks B. chageun reviews plans and code adversarially at every step, and actually **clicks through your real screens in an isolated environment** to break that loop.
 
 No jargon required. **Claude handles the code; you read plain-language explanations and just decide.**
 

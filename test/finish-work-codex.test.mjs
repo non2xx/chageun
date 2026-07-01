@@ -16,3 +16,13 @@ test("미래형 작업 약속만 있고 끝나면 차단", () => {
 test("빈/일반 메시지는 통과(보수적)", () => {
   assert.equal(decide({ last_assistant_message: "완료했습니다." }).block, false);
 });
+// Claude판과 동일 로직 검증(듀얼 미러 표류 방지) — bare 알려·검토 제거 + 보고성 약속 차단.
+test("검토·보고 약속만 하고 끝나면 차단(Fable 지적 사례)", () => {
+  assert.equal(decide({ last_assistant_message: "이제 코드를 검토하겠습니다" }).block, true);
+  assert.equal(decide({ last_assistant_message: "완료되면 알려드리겠습니다" }).block, true);
+});
+test("과거형·요약·요청은 통과(false-block 방지)", () => {
+  assert.equal(decide({ last_assistant_message: "코드를 검토했습니다. 문제 없습니다." }).block, false);
+  assert.equal(decide({ last_assistant_message: "확인해 주세요" }).block, false);
+  assert.equal(decide({ last_assistant_message: "결과를 정리하면 다음과 같습니다." }).block, false);
+});

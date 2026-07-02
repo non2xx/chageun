@@ -5,7 +5,12 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
-const { shouldBlock } = require(join(dirname(fileURLToPath(import.meta.url)), "..", "src", "hooks", "finish-work.js"));
+const { shouldBlock, shouldBlockNoEvidence } = require(join(dirname(fileURLToPath(import.meta.url)), "..", "src", "hooks", "finish-work.js"));
+
+const U = (t) => ({ message: { role: "user", content: [{ type: "text", text: t }] } });
+const A = (t) => ({ message: { role: "assistant", content: [{ type: "text", text: t }] } });
+const ATool = () => ({ message: { role: "assistant", content: [{ type: "tool_use", name: "Bash", input: {} }] } });
+const UResult = () => ({ message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } });
 
 // 막아야 하는 것 — 작업을 하겠다 약속만 하고 끝냄(도구 실행 없이).
 test("약속만 하고 끝난 응답은 차단", () => {
@@ -30,4 +35,22 @@ test("질문·완료·정상 마무리는 통과(false-block 방지)", () => {
   assert.equal(shouldBlock("이제 변경 내용을 설명합니다."), false, "현재형 설명");
   assert.equal(shouldBlock("승인해 주시면 진행하겠습니다."), false, "승인 대기");
   assert.equal(shouldBlock(""), false, "빈 텍스트");
+});
+
+// 증거 없는 성공 선언 가드 (W3+W5). F-1: tool_result(user)를 진짜 user로 착각하면 안 됨.
+test("증거가드: 도구 없이 '돌려봤다'만 하면 차단", () => {
+  assert.equal(shouldBlockNoEvidence([U("로그인 만들어줘"), A("돌려보니 테스트 통과했습니다.")]), true);
+});
+test("증거가드[F-1]: 이번 요청에 도구 썼으면(도구결과 user 사이에 껴도) 통과", () => {
+  const objs = [U("로그인 만들어줘"), ATool(), UResult(), A("돌려보니 테스트 통과했습니다.")];
+  assert.equal(shouldBlockNoEvidence(objs), false, "이전 턴 도구 실행 → 정상 끝 점검, 오차단 금지");
+});
+test("증거가드: 보고어휘(✅·성공기준)만으론 안 걸림(정상 끝 점검)", () => {
+  assert.equal(shouldBlockNoEvidence([U("요약해줘"), A("성공 기준 3개 ✅ 모두 충족했습니다.")]), false);
+});
+test("증거가드: 질문으로 끝나면 통과", () => {
+  assert.equal(shouldBlockNoEvidence([U("만들어줘"), A("돌려볼까요?")]), false);
+});
+test("증거가드: 과거참조 재보고('아까 돌려보니')는 통과", () => {
+  assert.equal(shouldBlockNoEvidence([U("좋아"), A("아까 돌려보니 테스트 통과했으니 마무리합니다.")]), false);
 });

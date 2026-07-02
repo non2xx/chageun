@@ -2,19 +2,49 @@
 // "말로 된 브레이크"를 기계 브레이크로: 되돌리기 불가능한 소수 고위험 패턴만 결정론적으로 막는다.
 // 얇은 그물이지 만능 아님 — 확실히 파괴적인 경우만 차단(오탐 회피). 매치 시 exit 2 + stderr 사유.
 // 예외·불확실은 안전 통과(exit 0). 외부 호출 없음. 개인/회사 정보 없음.
-// NOTE: Codex 훅은 PreToolUse를 지원하지 않아 이 방어는 Claude에만 있다(Codex는 텍스트 멈춤규칙에 의존).
+// 순수 패턴 판정은 core, 부수효과(env 탈출구·transcript 읽기)는 이 래퍼에 둔다.
+// NOTE: Codex 훅은 PreToolUse 미지원 → 이 방어는 Claude에만 있다(Codex는 텍스트 멈춤규칙 의존).
 
-const { block, reasonFor } = require("./pretooluse-core.js");
+const fs = require("fs");
+const { block, reasonFor, isPrCreate, hasPrReviewer } = require("./pretooluse-core.js");
+
+function deny(reasonKey) {
+  process.stderr.write(reasonFor(reasonKey));
+  process.exit(2); // PreToolUse: exit 2 = 도구 호출 차단, stderr를 Claude에 전달
+}
+
+// transcript를 읽어 pr-reviewer 실행 흔적 확인. 못 읽으면 fail-open(true) — 훅 오류로 정상작업 안 막음.
+function prReviewerRan(transcriptPath) {
+  try {
+    if (!transcriptPath || !fs.existsSync(transcriptPath)) return true; // fail-open(no-op)
+    const objs = [];
+    for (const ln of fs.readFileSync(transcriptPath, "utf8").split("\n")) {
+      const s = ln.trim(); if (!s) continue;
+      try { objs.push(JSON.parse(s)); } catch (_) { /* skip */ }
+    }
+    return hasPrReviewer(objs);
+  } catch (_) { return true; } // 어떤 예외든 fail-open
+}
 
 let raw = "";
 process.stdin.on("data", (d) => { raw += d; });
 process.stdin.on("end", () => {
   try {
     const input = JSON.parse(raw);
-    const hit = block(input.tool_name, input.tool_input || {});
-    if (hit) {
-      process.stderr.write(reasonFor(hit));
-      process.exit(2); // PreToolUse: exit 2 = 도구 호출 차단, stderr를 Claude에 전달
+    const name = input.tool_name;
+    const ti = input.tool_input || {};
+
+    // 1) 패턴 기반 차단. 단 배포는 사용자가 세션에 CHAGEUN_ALLOW_DEPLOY=1 설정 시 통과.
+    const hit = block(name, ti);
+    if (hit === "deploy") {
+      if (process.env.CHAGEUN_ALLOW_DEPLOY !== "1") return deny("deploy");
+    } else if (hit) {
+      return deny(hit);
+    }
+
+    // 2) 게이트 생략 감지: gh pr create/merge인데 이 세션에 pr-reviewer 실행 흔적이 없으면 차단.
+    if (isPrCreate(name, ti) && process.env.CHAGEUN_SKIP_GATE_CHECK !== "1") {
+      if (!prReviewerRan(input.transcript_path)) return deny("gate-skip");
     }
   } catch (_) { /* 안전 통과 */ }
   process.exit(0);

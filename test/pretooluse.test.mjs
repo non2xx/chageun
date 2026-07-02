@@ -5,7 +5,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
-const { block } = require(join(dirname(fileURLToPath(import.meta.url)), "..", "src", "hooks", "pretooluse-core.js"));
+const { block, isPrCreate, hasPrReviewer } = require(join(dirname(fileURLToPath(import.meta.url)), "..", "src", "hooks", "pretooluse-core.js"));
 
 const bash = (command) => block("Bash", { command });
 const sql = (query) => block("mcp__plugin_supabase_supabase__execute_sql", { query });
@@ -51,4 +51,33 @@ test("관계없는 도구·명령·문자열 속 SQL어는 통과(오탐 방지)
   assert.equal(bash("npm test"), null);
   assert.equal(bash("git commit -m 'fix DROP TABLE parsing bug'"), null, "커밋 메시지의 DROP은 오탐 아님");
   assert.equal(bash("echo 'DELETE FROM cache'"), null, "SQL 클라이언트 아니면 미검사");
+});
+
+test("배포·publish CLI 차단 · 프리뷰/dry-run 통과", () => {
+  assert.equal(bash("vercel --prod"), "deploy");
+  assert.equal(bash("netlify deploy --prod"), "deploy");
+  assert.equal(bash("fly deploy"), "deploy");
+  assert.equal(bash("npm publish"), "deploy");
+  assert.equal(bash("gh release create v1.0"), "deploy");
+  assert.equal(bash("supabase db push"), "deploy");
+  assert.equal(bash("vercel"), null, "프리뷰 배포는 통과");
+  assert.equal(bash("npm publish --dry-run"), null, "dry-run 통과");
+  assert.equal(bash("npm publish && echo --dry-run"), "deploy", "무관 세그먼트의 --dry-run으로 우회 불가");
+  assert.equal(bash("wrangler deploy"), "deploy");
+  assert.equal(bash("wrangler tail deploy-logs"), null, "wrangler 로그조회는 오탐 아님");
+});
+
+test("isPrCreate: gh pr create/merge만 감지", () => {
+  assert.equal(isPrCreate("Bash", { command: "gh pr create --fill" }), true);
+  assert.equal(isPrCreate("Bash", { command: "gh pr merge 12" }), true);
+  assert.equal(isPrCreate("Bash", { command: "gh pr list" }), false);
+  assert.equal(isPrCreate("Bash", { command: "git push" }), false);
+});
+
+test("hasPrReviewer: 실제 Task 실행만 감지(문자열 언급 무시)", () => {
+  const ran = [{ message: { role: "assistant", content: [{ type: "tool_use", name: "Task", input: { subagent_type: "chageun:pr-reviewer" } }] } }];
+  const mentionOnly = [{ message: { role: "assistant", content: [{ type: "text", text: "pr-reviewer 게이트를 거치겠습니다" }] } }];
+  assert.equal(hasPrReviewer(ran), true);
+  assert.equal(hasPrReviewer(mentionOnly), false, "언급만으론 흔적 아님");
+  assert.equal(hasPrReviewer([]), false);
 });

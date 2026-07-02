@@ -21,6 +21,42 @@ function shouldBlock(text) {
 }
 
 const REASON = "직전 응답이 작업을 하겠다고 말만 하고 실제로 하지 않은 채 끝났습니다. 지금 그 작업을 도구로 수행하세요. 작업이 끝났거나 사용자만 줄 수 있는 입력이 필요할 때만 턴을 끝내세요.";
+const REASON_NOEVIDENCE = "\"돌려봤다/테스트 통과\"처럼 실제로 실행한 것처럼 말했지만, 이번 요청 동안 도구를 한 번도 쓰지 않았습니다. 코드를 읽어 짐작하지 말고 실제로 돌려(테스트·실행·스크린샷) 확인한 뒤 그 증거로 보고하세요.";
+
+// 실행 주장(돌려봤다/테스트 통과 등). 보고어휘(✅·성공 기준·완료)는 제외 — 정상 끝 점검 오차단 방지.
+const EXEC_CLAIM_RE = /돌려\s*(보|봤|본)|실행해\s*(보|봤|본)|테스트[^.!?\n]{0,20}통과|스크린샷[^.!?\n]{0,10}(찍|캡처)|직접\s*눌러|구동\s*검증[^.!?\n]{0,10}(완료|했|끝)|실제로\s*(확인|실행)|눌러\s*(보|봤)/;
+
+// user 메시지가 도구결과(tool_result)로만 이뤄졌으면 '진짜 user'가 아님(도구 실행 결과).
+function isToolResultOnly(m) {
+  const c = m && m.content;
+  return Array.isArray(c) && c.length > 0 && c.every((b) => b && b.type === "tool_result");
+}
+
+// 직전 '진짜 user 메시지' 이후 assistant 구간에서 도구를 한 번도 안 쓰고(0회) 실행 주장만 하며
+// 끝났으면 차단(증거 없는 성공 선언). F-1: tool_result(role=user)를 진짜 user로 착각하지 않도록
+// 건너뛴다 — 이전 턴에 도구를 썼으면(정상 끝 점검) 통과.
+function shouldBlockNoEvidence(objs) {
+  if (!Array.isArray(objs) || !objs.length) return false;
+  let u = -1;
+  for (let i = objs.length - 1; i >= 0; i--) {
+    if (roleOf(objs[i]) !== "user") continue;
+    if (isToolResultOnly(msgOf(objs[i]))) continue; // 도구결과 user는 건너뜀
+    u = i; break;
+  }
+  let toolCount = 0; const texts = [];
+  for (let i = u + 1; i < objs.length; i++) {
+    if (roleOf(objs[i]) !== "assistant") continue;
+    const m = msgOf(objs[i]);
+    if (Array.isArray(m.content)) for (const b of m.content) if (b && b.type === "tool_use") toolCount++;
+    const t = textOf(m); if (t) texts.push(t);
+  }
+  if (toolCount > 0) return false; // 이번 요청 동안 도구 사용 → 정상, 통과
+  const tail = texts.join("\n").trim().slice(-600);
+  if (!tail || WAIT_RE.test(tail)) return false;
+  // 과거 참조("아까 돌려보니")면 이전 실행 재보고이므로 통과(후속 턴 오차단 방지).
+  if (/아까|앞서|이전에|기존에|already|earlier|previously/.test(tail)) return false;
+  return EXEC_CLAIM_RE.test(tail);
+}
 
 function roleOf(o) { return o.type || (o.message && o.message.role) || ""; }
 function msgOf(o) { return o.message || o; }
@@ -73,10 +109,11 @@ function run() {
         if (t) texts.unshift(t);
       }
       const text = texts.join("\n").trim();
-      if (!text) return process.exit(0);
-
-      if (!shouldBlock(text)) return process.exit(0);
-      process.stdout.write(JSON.stringify({ decision: "block", reason: REASON }));
+      const promise = text ? shouldBlock(text) : false;
+      const noEvidence = shouldBlockNoEvidence(objs);
+      if (!promise && !noEvidence) return process.exit(0);
+      const reason = promise ? REASON : REASON_NOEVIDENCE;
+      process.stdout.write(JSON.stringify({ decision: "block", reason }));
       process.exit(0);
     } catch (_) {
       process.exit(0); // 어떤 예외든 안전 통과(chageun를 막지 않는다).
@@ -84,5 +121,5 @@ function run() {
   });
 }
 
-module.exports = { shouldBlock, WAIT_RE, PROMISE_RE };
+module.exports = { shouldBlock, shouldBlockNoEvidence, WAIT_RE, PROMISE_RE };
 if (require.main === module) run();
